@@ -13,7 +13,19 @@
             <flux:sidebar.nav>
                 <flux:sidebar.group :heading="__('Platform')" class="grid">
                     <flux:sidebar.item icon="home" :href="route('dashboard')" :current="request()->routeIs('dashboard')" wire:navigate>
-                        {{ __('Dashboard') }}
+                        {{ __('Overview') }}
+                    </flux:sidebar.item>
+
+                    <flux:sidebar.item icon="server" :href="route('devices.index')" :current="request()->routeIs('devices.*')" wire:navigate>
+                        {{ __('Devices') }}
+                    </flux:sidebar.item>
+
+                    <flux:sidebar.item icon="bell-alert" :href="route('alerts.index')" :current="request()->routeIs('alerts.*')" wire:navigate>
+                        {{ __('Alerts') }}
+                    </flux:sidebar.item>
+
+                    <flux:sidebar.item icon="cog" :href="route('profile.edit')" :current="request()->routeIs(['profile.edit', 'security.edit', 'appearance.edit', 'thresholds.edit'])" wire:navigate>
+                        {{ __('Settings') }}
                     </flux:sidebar.item>
                 </flux:sidebar.group>
             </flux:sidebar.nav>

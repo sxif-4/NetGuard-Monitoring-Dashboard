@@ -2,8 +2,15 @@
 
 namespace Tests\Feature;
 
+use App\Enums\AlertSeverity;
+use App\Enums\AlertStatus;
+use App\Enums\DeviceStatus;
+use App\Livewire\Dashboard;
+use App\Models\Alert;
+use App\Models\Device;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Livewire\Livewire;
 use Tests\TestCase;
 
 class DashboardTest extends TestCase
@@ -23,5 +30,68 @@ class DashboardTest extends TestCase
 
         $response = $this->get(route('dashboard'));
         $response->assertOk();
+        $response->assertSee('Overview');
+    }
+
+    public function test_device_counts_reflect_seeded_devices(): void
+    {
+        $this->actingAs(User::factory()->create());
+
+        Device::factory()->count(3)->create(['status' => DeviceStatus::Online]);
+        Device::factory()->count(2)->create(['status' => DeviceStatus::Warning]);
+        Device::factory()->count(1)->create(['status' => DeviceStatus::Offline]);
+
+        $component = Livewire::test(Dashboard::class);
+
+        $this->assertSame([
+            'total' => 6,
+            'online' => 3,
+            'warning' => 2,
+            'offline' => 1,
+        ], $component->instance()->deviceCounts());
+    }
+
+    public function test_network_health_is_critical_when_a_monitored_device_is_offline(): void
+    {
+        $this->actingAs(User::factory()->create());
+
+        Device::factory()->create(['status' => DeviceStatus::Offline, 'monitoring_enabled' => true]);
+
+        $component = Livewire::test(Dashboard::class);
+
+        $this->assertSame('critical', $component->instance()->networkHealth());
+    }
+
+    public function test_network_health_is_healthy_with_no_devices_or_alerts(): void
+    {
+        $this->actingAs(User::factory()->create());
+
+        $component = Livewire::test(Dashboard::class);
+
+        $this->assertSame('healthy', $component->instance()->networkHealth());
+    }
+
+    public function test_recent_alerts_are_ordered_by_last_detected_at(): void
+    {
+        $this->actingAs(User::factory()->create());
+
+        $older = Alert::factory()->create([
+            'last_detected_at' => now()->subHours(3),
+            'status' => AlertStatus::Active,
+            'severity' => AlertSeverity::Low,
+        ]);
+
+        $newer = Alert::factory()->create([
+            'last_detected_at' => now()->subMinutes(5),
+            'status' => AlertStatus::Active,
+            'severity' => AlertSeverity::Low,
+        ]);
+
+        $component = Livewire::test(Dashboard::class);
+
+        $recent = $component->instance()->recentAlerts();
+
+        $this->assertSame($newer->id, $recent->first()->id);
+        $this->assertSame($older->id, $recent->last()->id);
     }
 }
