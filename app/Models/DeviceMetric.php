@@ -2,7 +2,9 @@
 
 namespace App\Models;
 
+use Database\Factories\DeviceMetricFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Carbon;
@@ -28,6 +30,9 @@ use Illuminate\Support\Carbon;
 #[Fillable(['device_id', 'reachable', 'latency_ms', 'packet_loss_pct', 'cpu_pct', 'memory_pct', 'bandwidth_pct', 'bandwidth_in_bps', 'bandwidth_out_bps', 'uptime_seconds', 'error', 'polled_at'])]
 class DeviceMetric extends Model
 {
+    /** @use HasFactory<DeviceMetricFactory> */
+    use HasFactory;
+
     /**
      * Get the attributes that should be cast.
      *

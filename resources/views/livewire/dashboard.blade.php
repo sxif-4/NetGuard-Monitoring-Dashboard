@@ -37,6 +37,16 @@
         </flux:card>
     </div>
 
+    <flux:card>
+        <x-trend-chart
+            chart-id="alert-count"
+            :label="__('Alerts (last 30 days)')"
+            unit=""
+            color="#008300"
+            :points="$this->alertCountSeries"
+        />
+    </flux:card>
+
     <flux:card class="flex-1">
         <div class="flex items-center justify-between">
             <flux:heading size="lg">{{ __('Recent Alerts') }}</flux:heading>

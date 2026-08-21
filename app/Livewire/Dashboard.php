@@ -82,6 +82,37 @@ class Dashboard extends Component
             ->get();
     }
 
+    /**
+     * Daily alert counts over the last 30 days, for the Overview trend chart.
+     *
+     * Bucketed in PHP rather than via `date_trunc` (Postgres-only — the test
+     * suite runs on SQLite per phpunit.xml) to stay portable across both.
+     *
+     * @return array<int, array{bucket: string, value: int}>
+     */
+    #[Computed]
+    public function alertCountSeries(): array
+    {
+        $since = now()->subDays(30)->startOfDay();
+
+        $counts = Alert::query()
+            ->where('first_detected_at', '>=', $since)
+            ->pluck('first_detected_at')
+            ->countBy(fn ($timestamp) => $timestamp->format('Y-m-d'));
+
+        $points = [];
+        $endTimestamp = now()->getTimestamp();
+
+        for ($timestamp = $since->getTimestamp(); $timestamp <= $endTimestamp; $timestamp += 86400) {
+            $points[] = [
+                'bucket' => date('M j', $timestamp),
+                'value' => (int) ($counts[date('Y-m-d', $timestamp)] ?? 0),
+            ];
+        }
+
+        return $points;
+    }
+
     public function render(): View
     {
         return view('livewire.dashboard');

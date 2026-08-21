@@ -56,6 +56,7 @@
                     <flux:table.cell>{{ $device->last_seen_at?->diffForHumans() ?? __('Never') }}</flux:table.cell>
                     <flux:table.cell>
                         <div class="flex justify-end gap-2">
+                            <flux:button size="sm" variant="ghost" icon="eye" :href="route('devices.show', $device)" wire:navigate :aria-label="__('View')" />
                             <flux:button size="sm" variant="ghost" icon="pencil" wire:click="edit({{ $device->id }})" :aria-label="__('Edit')" />
                             <flux:button size="sm" variant="ghost" icon="trash" wire:click="confirmDelete({{ $device->id }})" :aria-label="__('Delete')" />
                         </div>
