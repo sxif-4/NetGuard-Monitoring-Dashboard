@@ -8,12 +8,16 @@ use App\Http\Requests\Api\StoreDeviceMetricsRequest;
 use App\Http\Resources\DeviceMonitoringResource;
 use App\Models\Device;
 use App\Models\DeviceMetric;
+use App\Models\Threshold;
+use App\Services\Alerting\ThresholdAlertEvaluator;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Support\Facades\DB;
 
 class MonitoringController extends Controller
 {
+    public function __construct(private readonly ThresholdAlertEvaluator $alertEvaluator) {}
+
     /**
      * List the devices the daemon should poll this cycle.
      */
@@ -34,6 +38,8 @@ class MonitoringController extends Controller
         $entries = $request->validated('metrics');
 
         $accepted = DB::transaction(function () use ($entries) {
+            $thresholds = Threshold::all()->keyBy(fn (Threshold $threshold) => $threshold->metric->value);
+
             $count = 0;
 
             foreach ($entries as $entry) {
@@ -43,7 +49,7 @@ class MonitoringController extends Controller
                     continue;
                 }
 
-                DeviceMetric::create([
+                $metric = DeviceMetric::create([
                     'device_id' => $device->id,
                     'reachable' => $entry['reachable'],
                     'latency_ms' => $entry['latency_ms'] ?? null,
@@ -65,6 +71,8 @@ class MonitoringController extends Controller
                 }
 
                 $device->save();
+
+                $this->alertEvaluator->evaluate($device, $metric, $thresholds);
 
                 $count++;
             }

@@ -115,6 +115,14 @@
                     <dt class="text-zinc-500">{{ __('Last detected') }}</dt>
                     <dd>{{ $viewingAlert->last_detected_at->diffForHumans() }}</dd>
 
+                    @if ($viewingAlert->metadata && array_key_exists('value', $viewingAlert->metadata))
+                        <dt class="text-zinc-500">{{ __('Observed value') }}</dt>
+                        <dd>{{ $viewingAlert->metadata['value'] }}{{ $viewingAlert->metadata['unit'] ?? '' }}</dd>
+
+                        <dt class="text-zinc-500">{{ __('Threshold') }}</dt>
+                        <dd>{{ $viewingAlert->metadata['threshold'] }}{{ $viewingAlert->metadata['unit'] ?? '' }}</dd>
+                    @endif
+
                     @if ($viewingAlert->acknowledgedBy)
                         <dt class="text-zinc-500">{{ __('Acknowledged by') }}</dt>
                         <dd>{{ $viewingAlert->acknowledgedBy->name }} ({{ $viewingAlert->acknowledged_at->diffForHumans() }})</dd>
