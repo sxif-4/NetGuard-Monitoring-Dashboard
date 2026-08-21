@@ -19,6 +19,9 @@ use Illuminate\Support\Carbon;
  * @property string $ip_address
  * @property MonitoringMethod $monitoring_method
  * @property int|null $monitoring_port
+ * @property string|null $snmp_community
+ * @property string|null $snmp_version
+ * @property int|null $snmp_port
  * @property bool $monitoring_enabled
  * @property DeviceStatus $status
  * @property string|null $location
@@ -26,7 +29,7 @@ use Illuminate\Support\Carbon;
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  */
-#[Fillable(['name', 'type', 'ip_address', 'monitoring_method', 'monitoring_port', 'monitoring_enabled', 'status', 'location', 'last_seen_at'])]
+#[Fillable(['name', 'type', 'ip_address', 'monitoring_method', 'monitoring_port', 'snmp_community', 'snmp_version', 'snmp_port', 'monitoring_enabled', 'status', 'location', 'last_seen_at'])]
 class Device extends Model
 {
     /** @use HasFactory<DeviceFactory> */
@@ -54,5 +57,13 @@ class Device extends Model
     public function alerts(): HasMany
     {
         return $this->hasMany(Alert::class);
+    }
+
+    /**
+     * @return HasMany<DeviceMetric, $this>
+     */
+    public function metrics(): HasMany
+    {
+        return $this->hasMany(DeviceMetric::class);
     }
 }
