@@ -12,6 +12,8 @@ use Illuminate\Support\Carbon;
 
 class SecurityAlertEvaluator
 {
+    public function __construct(private readonly NotificationDispatcher $notifier) {}
+
     /**
      * anomaly_score cutoffs -> AlertSeverity. The daemon already filters out
      * anything below its own NETGUARD_ML_RISK_LOW_THRESHOLD before sending an
@@ -81,10 +83,12 @@ class SecurityAlertEvaluator
                 'last_detected_at' => $detectedAt,
             ]);
 
+            $this->notifier->dispatch($existing);
+
             return;
         }
 
-        Alert::create([
+        $alert = Alert::create([
             'device_id' => $device?->id,
             'category' => AlertCategory::Security,
             'type' => $type->value,
@@ -103,6 +107,8 @@ class SecurityAlertEvaluator
             'first_detected_at' => $detectedAt,
             'last_detected_at' => $detectedAt,
         ]);
+
+        $this->notifier->dispatch($alert);
     }
 
     private function severityFor(float $score): ?AlertSeverity

@@ -26,6 +26,7 @@ use Illuminate\Support\Carbon;
  * @property int $occurrences
  * @property Carbon $first_detected_at
  * @property Carbon $last_detected_at
+ * @property Carbon|null $last_notified_at
  * @property int|null $acknowledged_by
  * @property Carbon|null $acknowledged_at
  * @property int|null $resolved_by
@@ -33,7 +34,7 @@ use Illuminate\Support\Carbon;
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  */
-#[Fillable(['device_id', 'category', 'type', 'severity', 'status', 'title', 'description', 'metadata', 'occurrences', 'first_detected_at', 'last_detected_at', 'acknowledged_by', 'acknowledged_at', 'resolved_by', 'resolved_at'])]
+#[Fillable(['device_id', 'category', 'type', 'severity', 'status', 'title', 'description', 'metadata', 'occurrences', 'first_detected_at', 'last_detected_at', 'last_notified_at', 'acknowledged_by', 'acknowledged_at', 'resolved_by', 'resolved_at'])]
 class Alert extends Model
 {
     /** @use HasFactory<AlertFactory> */
@@ -53,6 +54,7 @@ class Alert extends Model
             'metadata' => 'array',
             'first_detected_at' => 'datetime',
             'last_detected_at' => 'datetime',
+            'last_notified_at' => 'datetime',
             'acknowledged_at' => 'datetime',
             'resolved_at' => 'datetime',
         ];

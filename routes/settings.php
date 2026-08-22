@@ -1,6 +1,7 @@
 <?php
 
 use App\Livewire\Settings\Appearance;
+use App\Livewire\Settings\Notifications;
 use App\Livewire\Settings\Profile;
 use App\Livewire\Settings\Security;
 use App\Livewire\Settings\Thresholds;
@@ -22,6 +23,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ->name('security.edit');
 
     Route::livewire('settings/thresholds', Thresholds::class)->name('thresholds.edit');
+
+    Route::livewire('settings/notifications', Notifications::class)->name('notifications.edit');
 });
 
 Route::get('.well-known/passkey-endpoints', function () {

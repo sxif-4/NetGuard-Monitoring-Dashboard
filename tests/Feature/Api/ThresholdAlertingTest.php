@@ -4,11 +4,14 @@ namespace Tests\Feature\Api;
 
 use App\Enums\AlertSeverity;
 use App\Enums\AlertStatus;
+use App\Jobs\SendTelegramAlertNotification;
 use App\Models\Alert;
 use App\Models\Device;
+use App\Models\NotificationSetting;
 use App\Models\User;
 use Database\Seeders\ThresholdSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Queue;
 use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
 
@@ -159,5 +162,26 @@ class ThresholdAlertingTest extends TestCase
         $this->assertEquals(95.0, $alert->metadata['value']);
         $this->assertEquals(90.0, $alert->metadata['threshold']);
         $this->assertSame('%', $alert->metadata['unit']);
+    }
+
+    public function test_a_critical_breach_queues_a_telegram_notification_when_enabled(): void
+    {
+        Queue::fake();
+        NotificationSetting::current()->update([
+            'telegram_enabled' => true,
+            'telegram_bot_token' => 'test-token',
+            'telegram_chat_id' => 'test-chat-id',
+        ]);
+
+        $device = Device::factory()->create();
+
+        $this->postMetric($device, ['cpu_pct' => 95]);
+
+        $alert = Alert::where('device_id', $device->id)->where('type', 'high_cpu')->first();
+
+        Queue::assertPushed(
+            SendTelegramAlertNotification::class,
+            fn ($job) => $job->alertId === $alert->id,
+        );
     }
 }

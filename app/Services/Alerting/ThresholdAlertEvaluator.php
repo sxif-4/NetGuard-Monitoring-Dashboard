@@ -14,6 +14,8 @@ use Illuminate\Support\Collection;
 
 class ThresholdAlertEvaluator
 {
+    public function __construct(private readonly NotificationDispatcher $notifier) {}
+
     /**
      * metric key => [type slug, title, DeviceMetric accessor]
      *
@@ -128,10 +130,12 @@ class ThresholdAlertEvaluator
                 'last_detected_at' => $polledAt,
             ]);
 
+            $this->notifier->dispatch($existing);
+
             return;
         }
 
-        Alert::create([
+        $alert = Alert::create([
             'device_id' => $device->id,
             'category' => AlertCategory::Operational,
             'type' => $type,
@@ -144,5 +148,7 @@ class ThresholdAlertEvaluator
             'first_detected_at' => $polledAt,
             'last_detected_at' => $polledAt,
         ]);
+
+        $this->notifier->dispatch($alert);
     }
 }

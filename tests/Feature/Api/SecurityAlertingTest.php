@@ -4,10 +4,13 @@ namespace Tests\Feature\Api;
 
 use App\Enums\AlertSeverity;
 use App\Enums\AlertStatus;
+use App\Mail\AlertNotificationMail;
 use App\Models\Alert;
 use App\Models\Device;
+use App\Models\NotificationSetting;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Mail;
 use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
 
@@ -135,5 +138,20 @@ class SecurityAlertingTest extends TestCase
         $this->assertSame('TCP', $alert->metadata['protocol']);
         $this->assertSame('isolation_forest', $alert->metadata['model']);
         $this->assertEquals(87.0, $alert->metadata['anomaly_score']);
+    }
+
+    public function test_a_critical_security_event_queues_an_email_when_enabled(): void
+    {
+        Mail::fake();
+        NotificationSetting::current()->update([
+            'email_enabled' => true,
+            'notification_email' => 'admin@example.com',
+        ]);
+
+        $this->postSecurityEvent(['anomaly_score' => 90.0]);
+
+        $alert = Alert::where('type', 'port_scan')->first();
+
+        Mail::assertQueued(AlertNotificationMail::class, fn ($mail) => $mail->alert->is($alert));
     }
 }
