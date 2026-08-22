@@ -37,6 +37,36 @@
         </flux:card>
     </div>
 
+    <div>
+        <flux:heading size="lg">{{ __('Security Summary') }}</flux:heading>
+        <div class="mt-2 grid auto-rows-min gap-4 md:grid-cols-5">
+            <flux:card class="flex flex-col gap-1">
+                <flux:text size="sm">{{ __('Anomalies Detected') }}</flux:text>
+                <flux:heading size="xl">{{ $this->securitySummary['anomalies_detected'] }}</flux:heading>
+            </flux:card>
+
+            <flux:card class="flex flex-col gap-1">
+                <flux:text size="sm">{{ __('Port Scan Attempts') }}</flux:text>
+                <flux:heading size="xl">{{ $this->securitySummary['port_scan_attempts'] }}</flux:heading>
+            </flux:card>
+
+            <flux:card class="flex flex-col gap-1">
+                <flux:text size="sm">{{ __('DoS Activity') }}</flux:text>
+                <flux:heading size="xl">{{ $this->securitySummary['dos_activity'] }}</flux:heading>
+            </flux:card>
+
+            <flux:card class="flex flex-col gap-1">
+                <flux:text size="sm">{{ __('Suspicious Behaviour') }}</flux:text>
+                <flux:heading size="xl">{{ $this->securitySummary['suspicious_behaviour'] }}</flux:heading>
+            </flux:card>
+
+            <flux:card class="flex flex-col gap-1">
+                <flux:text size="sm">{{ __('High-Risk Events') }}</flux:text>
+                <flux:heading size="xl" class="text-red-600 dark:text-red-400">{{ $this->securitySummary['high_risk_events'] }}</flux:heading>
+            </flux:card>
+        </div>
+    </div>
+
     <flux:card>
         <x-trend-chart
             chart-id="alert-count"

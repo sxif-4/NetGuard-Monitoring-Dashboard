@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Enums\AlertCategory;
 use App\Enums\AlertSeverity;
 use App\Enums\AlertStatus;
 use App\Enums\DeviceStatus;
@@ -93,5 +94,53 @@ class DashboardTest extends TestCase
 
         $this->assertSame($newer->id, $recent->first()->id);
         $this->assertSame($older->id, $recent->last()->id);
+    }
+
+    public function test_security_summary_counts_unresolved_security_alerts_by_type(): void
+    {
+        $this->actingAs(User::factory()->create());
+
+        Alert::factory()->create([
+            'category' => AlertCategory::Security,
+            'type' => 'port_scan',
+            'severity' => AlertSeverity::Critical,
+            'status' => AlertStatus::Active,
+        ]);
+        Alert::factory()->create([
+            'category' => AlertCategory::Security,
+            'type' => 'dos_activity',
+            'severity' => AlertSeverity::High,
+            'status' => AlertStatus::Active,
+        ]);
+        Alert::factory()->create([
+            'category' => AlertCategory::Security,
+            'type' => 'suspicious_ip',
+            'severity' => AlertSeverity::Low,
+            'status' => AlertStatus::Active,
+        ]);
+        // Resolved -- must not be counted.
+        Alert::factory()->create([
+            'category' => AlertCategory::Security,
+            'type' => 'port_scan',
+            'severity' => AlertSeverity::Critical,
+            'status' => AlertStatus::Resolved,
+        ]);
+        // Operational -- must not be counted in the security summary.
+        Alert::factory()->create([
+            'category' => AlertCategory::Operational,
+            'type' => 'high_cpu',
+            'severity' => AlertSeverity::Critical,
+            'status' => AlertStatus::Active,
+        ]);
+
+        $component = Livewire::test(Dashboard::class);
+
+        $this->assertSame([
+            'anomalies_detected' => 3,
+            'port_scan_attempts' => 1,
+            'dos_activity' => 1,
+            'suspicious_behaviour' => 1,
+            'high_risk_events' => 2,
+        ], $component->instance()->securitySummary());
     }
 }

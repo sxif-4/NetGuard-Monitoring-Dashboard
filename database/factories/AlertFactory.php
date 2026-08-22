@@ -5,6 +5,7 @@ namespace Database\Factories;
 use App\Enums\AlertCategory;
 use App\Enums\AlertSeverity;
 use App\Enums\AlertStatus;
+use App\Enums\SecurityAlertType;
 use App\Models\Alert;
 use App\Models\Device;
 use App\Models\User;
@@ -31,18 +32,6 @@ class AlertFactory extends Factory
     ];
 
     /**
-     * @var array<string, string>
-     */
-    private const SECURITY_TYPES = [
-        'port_scan' => 'Port Scan Detected',
-        'dos_activity' => 'DoS Activity',
-        'suspicious_ip' => 'Suspicious IP Activity',
-        'traffic_anomaly' => 'Traffic Anomaly',
-        'unusual_connection' => 'Unusual Connection Pattern',
-        'data_exfiltration' => 'Possible Data Exfiltration',
-    ];
-
-    /**
      * Define the model's default state.
      *
      * @return array<string, mixed>
@@ -50,8 +39,15 @@ class AlertFactory extends Factory
     public function definition(): array
     {
         $category = fake()->randomElement(AlertCategory::cases());
-        $types = $category === AlertCategory::Operational ? self::OPERATIONAL_TYPES : self::SECURITY_TYPES;
-        $type = fake()->randomElement(array_keys($types));
+
+        if ($category === AlertCategory::Operational) {
+            $type = fake()->randomElement(array_keys(self::OPERATIONAL_TYPES));
+            $title = self::OPERATIONAL_TYPES[$type];
+        } else {
+            $securityType = fake()->randomElement(SecurityAlertType::cases());
+            $type = $securityType->value;
+            $title = $securityType->label();
+        }
 
         $firstDetected = fake()->dateTimeBetween('-7 days', '-1 hour');
 
@@ -67,7 +63,7 @@ class AlertFactory extends Factory
                 AlertSeverity::Informational,
             ]),
             'status' => fake()->randomElement(AlertStatus::cases()),
-            'title' => $types[$type],
+            'title' => $title,
             'description' => fake()->sentence(12),
             'metadata' => null,
             'occurrences' => fake()->numberBetween(1, 5),

@@ -123,6 +123,23 @@
                         <dd>{{ $viewingAlert->metadata['threshold'] }}{{ $viewingAlert->metadata['unit'] ?? '' }}</dd>
                     @endif
 
+                    @if ($viewingAlert->metadata && array_key_exists('source_ip', $viewingAlert->metadata))
+                        <dt class="text-zinc-500">{{ __('Source IP') }}</dt>
+                        <dd>{{ $viewingAlert->metadata['source_ip'] }}</dd>
+
+                        <dt class="text-zinc-500">{{ __('Destination IP') }}</dt>
+                        <dd>{{ $viewingAlert->metadata['destination_ip'] ?? __('—') }}</dd>
+
+                        <dt class="text-zinc-500">{{ __('Protocol') }}</dt>
+                        <dd>{{ $viewingAlert->metadata['protocol'] }}</dd>
+
+                        <dt class="text-zinc-500">{{ __('Detection model') }}</dt>
+                        <dd>{{ $viewingAlert->metadata['model'] === 'random_forest' ? __('Random Forest') : __('Isolation Forest') }}</dd>
+
+                        <dt class="text-zinc-500">{{ __('Anomaly score') }}</dt>
+                        <dd>{{ round($viewingAlert->metadata['anomaly_score']) }}/100</dd>
+                    @endif
+
                     @if ($viewingAlert->acknowledgedBy)
                         <dt class="text-zinc-500">{{ __('Acknowledged by') }}</dt>
                         <dd>{{ $viewingAlert->acknowledgedBy->name }} ({{ $viewingAlert->acknowledged_at->diffForHumans() }})</dd>

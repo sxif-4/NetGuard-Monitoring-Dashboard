@@ -2,9 +2,11 @@
 
 namespace App\Livewire;
 
+use App\Enums\AlertCategory;
 use App\Enums\AlertSeverity;
 use App\Enums\AlertStatus;
 use App\Enums\DeviceStatus;
+use App\Enums\SecurityAlertType;
 use App\Models\Alert;
 use App\Models\Device;
 use Illuminate\Database\Eloquent\Collection;
@@ -80,6 +82,41 @@ class Dashboard extends Component
             ->orderByDesc('last_detected_at')
             ->limit(5)
             ->get();
+    }
+
+    /**
+     * Security Summary widget (plan.md §5.4) — counts of unresolved
+     * security-category alerts, by type.
+     *
+     * @return array<string, int>
+     */
+    #[Computed]
+    public function securitySummary(): array
+    {
+        $counts = Alert::query()
+            ->where('category', AlertCategory::Security)
+            ->where('status', '!=', AlertStatus::Resolved)
+            ->selectRaw('type, count(*) as count')
+            ->groupBy('type')
+            ->pluck('count', 'type');
+
+        $highRiskEvents = Alert::query()
+            ->where('category', AlertCategory::Security)
+            ->where('status', '!=', AlertStatus::Resolved)
+            ->whereIn('severity', [AlertSeverity::Critical, AlertSeverity::High])
+            ->count();
+
+        return [
+            'anomalies_detected' => (int) $counts->sum(),
+            'port_scan_attempts' => (int) ($counts[SecurityAlertType::PortScan->value] ?? 0),
+            'dos_activity' => (int) ($counts[SecurityAlertType::DosActivity->value] ?? 0),
+            'suspicious_behaviour' => (int) (
+                ($counts[SecurityAlertType::SuspiciousIp->value] ?? 0)
+                + ($counts[SecurityAlertType::UnusualConnection->value] ?? 0)
+                + ($counts[SecurityAlertType::TrafficAnomaly->value] ?? 0)
+            ),
+            'high_risk_events' => $highRiskEvents,
+        ];
     }
 
     /**
