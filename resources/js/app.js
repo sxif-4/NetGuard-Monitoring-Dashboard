@@ -32,6 +32,13 @@ function buildData(points, label, color) {
 }
 
 function buildOptions(label, unit) {
+    // Chart.js draws to a <canvas>, which can't pick up CSS `dark:` variants --
+    // read the theme once at build time instead so gridlines/ticks are legible
+    // against both the light and the dark (navy) page background.
+    const dark = document.documentElement.classList.contains('dark');
+    const gridColor = dark ? 'rgba(255, 255, 255, 0.06)' : '#e1e0d9';
+    const tickColor = dark ? '#71717a' : '#898781';
+
     return {
         responsive: true,
         maintainAspectRatio: false,
@@ -39,13 +46,13 @@ function buildOptions(label, unit) {
         scales: {
             x: {
                 grid: { display: false },
-                ticks: { maxTicksLimit: 6, color: '#898781' },
+                ticks: { maxTicksLimit: 6, color: tickColor },
             },
             y: {
                 beginAtZero: true,
-                grid: { color: '#e1e0d9' },
+                grid: { color: gridColor },
                 ticks: {
-                    color: '#898781',
+                    color: tickColor,
                     callback: (value) => `${value}${unit}`,
                 },
             },

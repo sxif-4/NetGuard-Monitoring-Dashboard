@@ -3,8 +3,13 @@
     <head>
         @include('partials.head')
     </head>
-    <body class="min-h-screen bg-white dark:bg-zinc-800">
-        <flux:sidebar sticky collapsible="mobile" class="border-e border-zinc-200 bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900">
+    <body class="min-h-screen bg-white dark:bg-[#080b12]">
+        <div class="pointer-events-none fixed inset-0 -z-10 hidden dark:block">
+            <div class="absolute -top-40 left-1/4 h-[36rem] w-[36rem] rounded-full bg-cyan-500/10 blur-[120px]"></div>
+            <div class="absolute top-1/3 -right-40 h-[30rem] w-[30rem] rounded-full bg-rose-500/10 blur-[120px]"></div>
+        </div>
+
+        <flux:sidebar sticky collapsible="mobile" class="border-e border-zinc-200 bg-zinc-50 dark:border-white/5 dark:bg-[#0a0e17]">
             <flux:sidebar.header>
                 <x-app-logo :sidebar="true" href="{{ route('dashboard') }}" wire:navigate />
                 <flux:sidebar.collapse class="lg:hidden" />
@@ -24,23 +29,13 @@
                         {{ __('Alerts') }}
                     </flux:sidebar.item>
 
-                    <flux:sidebar.item icon="cog" :href="route('profile.edit')" :current="request()->routeIs(['profile.edit', 'security.edit', 'appearance.edit', 'thresholds.edit'])" wire:navigate>
+                    <flux:sidebar.item icon="cog" :href="route('profile.edit')" :current="request()->routeIs(['profile.edit', 'security.edit', 'appearance.edit', 'thresholds.edit', 'notifications.edit'])" wire:navigate>
                         {{ __('Settings') }}
                     </flux:sidebar.item>
                 </flux:sidebar.group>
             </flux:sidebar.nav>
 
             <flux:spacer />
-
-            <flux:sidebar.nav>
-                <flux:sidebar.item icon="folder-git-2" href="https://github.com/laravel/livewire-starter-kit" target="_blank">
-                    {{ __('Repository') }}
-                </flux:sidebar.item>
-
-                <flux:sidebar.item icon="book-open-text" href="https://laravel.com/docs/starter-kits#livewire" target="_blank">
-                    {{ __('Documentation') }}
-                </flux:sidebar.item>
-            </flux:sidebar.nav>
 
             <x-desktop-user-menu class="hidden lg:block" :name="auth()->user()->name" />
         </flux:sidebar>

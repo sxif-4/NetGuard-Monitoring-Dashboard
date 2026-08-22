@@ -5,7 +5,7 @@
             <flux:subheading>{{ __('Manage monitored network devices') }}</flux:subheading>
         </div>
 
-        <flux:button variant="primary" icon="plus" wire:click="create">
+        <flux:button variant="primary" icon="plus" wire:click="create" class="dark:bg-gradient-to-r dark:from-cyan-400 dark:to-rose-400 dark:hover:opacity-90">
             {{ __('Add Device') }}
         </flux:button>
     </div>
