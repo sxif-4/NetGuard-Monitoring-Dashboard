@@ -31,8 +31,12 @@ class ThresholdAlertEvaluator
 
     /**
      * Evaluate one polled metric against the configured thresholds, creating or
-     * updating the relevant operational Alert(s). Never resolves an alert —
-     * that's left to a human, even after the underlying condition clears.
+     * updating the relevant operational Alert(s). Threshold breaches (high
+     * CPU, latency, etc.) are never auto-resolved — that's left to a human,
+     * even after the underlying condition clears. device_offline is the one
+     * exception: reachability is a clean binary the daemon itself observes
+     * directly each cycle, so a device answering again auto-resolves its own
+     * offline alert and fires an "Up" recovery notification.
      *
      * @param  Collection<string, Threshold>  $thresholds  keyed by metric slug
      */
@@ -51,6 +55,8 @@ class ThresholdAlertEvaluator
 
             return;
         }
+
+        $this->recoverIfWasOffline($device, $metric->polled_at);
 
         foreach (self::METRIC_ALERTS as $metricKey => [$type, $title, $accessor]) {
             $value = $metric->{$accessor};
@@ -88,6 +94,26 @@ class ThresholdAlertEvaluator
                 polledAt: $metric->polled_at,
             );
         }
+    }
+
+    private function recoverIfWasOffline(Device $device, DateTimeInterface $polledAt): void
+    {
+        $alert = Alert::query()
+            ->where('device_id', $device->id)
+            ->where('type', 'device_offline')
+            ->where('status', '!=', AlertStatus::Resolved)
+            ->first();
+
+        if ($alert === null) {
+            return;
+        }
+
+        $alert->update([
+            'status' => AlertStatus::Resolved,
+            'resolved_at' => $polledAt,
+        ]);
+
+        $this->notifier->notifyRecovery($alert);
     }
 
     private function severityFor(float $value, Threshold $threshold): ?AlertSeverity

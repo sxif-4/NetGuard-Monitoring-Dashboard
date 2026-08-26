@@ -213,6 +213,7 @@ class Dashboard extends Component
     {
         return Alert::query()
             ->with('device')
+            ->where('status', '!=', AlertStatus::Resolved)
             ->orderByDesc('last_detected_at')
             ->limit(5)
             ->get();
@@ -286,6 +287,7 @@ class Dashboard extends Component
 
     public function render(): View
     {
-        return view('livewire.dashboard');
+        return view('livewire.dashboard')
+            ->layout(auth()->user()->isAdmin() ? 'layouts.app' : 'layouts.restricted');
     }
 }

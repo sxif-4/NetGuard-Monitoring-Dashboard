@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Enums\AlertSeverity;
 use App\Models\Alert;
 use App\Models\NotificationSetting;
 use App\Services\Notifications\TelegramNotifier;
@@ -33,8 +34,13 @@ class SendTelegramAlertNotification implements ShouldQueue
      * Takes the alert's id, not the model, so the queued payload stays a
      * plain integer rather than a serialized Eloquent snapshot that could
      * go stale by the time the job actually runs.
+     *
+     * $recovered distinguishes a "this just started" push from a "this just
+     * cleared" push for the *same* alert row -- ThresholdAlertEvaluator
+     * dispatches this a second time, with recovered: true, once a
+     * previously-offline device answers again.
      */
-    public function __construct(public readonly int $alertId) {}
+    public function __construct(public readonly int $alertId, public readonly bool $recovered = false) {}
 
     public function handle(TelegramNotifier $notifier): void
     {
@@ -67,13 +73,27 @@ class SendTelegramAlertNotification implements ShouldQueue
         $device = $alert->device;
         $deviceName = $device !== null ? $device->name : 'Network-wide';
 
+        if ($this->recovered) {
+            return sprintf("%s\n*%s* | ✅ Up", $alert->category->label(), $deviceName);
+        }
+
         return sprintf(
-            "*%s*\n%s\n\nDevice: %s\nOccurrences: %d\nFirst detected: %s",
-            $alert->title,
-            $alert->description ?? '',
+            "%s\n*%s* | %s %s",
+            $alert->category->label(),
             $deviceName,
-            $alert->occurrences,
-            $alert->first_detected_at->toDayDateTimeString(),
+            $this->severityIcon($alert->severity),
+            $alert->title,
         );
+    }
+
+    private function severityIcon(AlertSeverity $severity): string
+    {
+        return match ($severity) {
+            AlertSeverity::Critical => '🔴',
+            AlertSeverity::High => '🟠',
+            AlertSeverity::Medium => '🟡',
+            AlertSeverity::Low => '🔵',
+            AlertSeverity::Informational => 'ℹ️',
+        };
     }
 }

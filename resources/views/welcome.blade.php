@@ -6,9 +6,9 @@
 
         <title>{{ config('app.name', 'NetGuard') }} — Real-time network monitoring &amp; threat detection</title>
 
-        <link rel="icon" href="/favicon.ico" sizes="any">
-        <link rel="icon" href="/favicon.svg" type="image/svg+xml">
-        <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+        <link rel="icon" href="/favicon.ico?v=2" sizes="any">
+        <link rel="icon" href="/favicon.svg?v=2" type="image/svg+xml">
+        <link rel="apple-touch-icon" href="/apple-touch-icon.png?v=2">
 
         @fonts
 
@@ -101,62 +101,79 @@
                         </div>
                     </div>
 
-                    {{-- Live-look dashboard preview card --}}
+                    {{-- Live-look dashboard preview card, matching the real Overview page's content --}}
                     <div class="relative">
                         <div class="absolute -inset-6 rounded-3xl bg-gradient-to-br from-cyan-500/10 to-rose-500/10 blur-2xl"></div>
                         <div class="relative overflow-hidden rounded-2xl border border-white/10 bg-[#0c1018] shadow-2xl">
                             <div class="flex items-center justify-between border-b border-white/5 px-5 py-3.5">
-                                <div class="flex items-center gap-2">
-                                    <x-netguard-mark class="size-5" />
+                                <div>
                                     <span class="text-sm font-medium text-white">Overview</span>
+                                    <span class="ml-2 text-[11px] text-zinc-500">Real-time infrastructure health</span>
                                 </div>
-                                <span class="flex items-center gap-1.5 rounded-full bg-emerald-500/10 px-2.5 py-1 text-xs text-emerald-400">
-                                    <span class="size-1.5 rounded-full bg-emerald-400"></span>
-                                    Live
-                                </span>
+                                <span class="rounded-md bg-rose-500/15 px-2 py-1 text-[10px] font-medium text-rose-400">Critical</span>
                             </div>
 
-                            <div class="grid grid-cols-3 gap-3 p-5">
+                            <div class="grid grid-cols-2 gap-3 p-5">
                                 <div class="rounded-xl border border-white/5 bg-white/[0.03] p-3">
-                                    <p class="text-[11px] text-zinc-500">Devices</p>
-                                    <p class="mt-1 text-xl font-semibold text-white">24</p>
-                                    <p class="mt-0.5 text-[11px] text-emerald-400">21 online</p>
+                                    <div class="flex items-start justify-between">
+                                        <p class="text-[11px] text-zinc-500">Total Devices</p>
+                                        <span class="flex size-5 items-center justify-center rounded-md bg-cyan-500/15 text-cyan-400">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="size-3"><rect x="2" y="3" width="20" height="8" rx="2" /><rect x="2" y="13" width="20" height="8" rx="2" /><circle cx="6" cy="7" r="0.6" fill="currentColor" /><circle cx="6" cy="17" r="0.6" fill="currentColor" /></svg>
+                                        </span>
+                                    </div>
+                                    <p class="mt-1 text-xl font-semibold text-white">18</p>
+                                    <p class="mt-0.5 text-[11px] text-emerald-400">15 online</p>
                                 </div>
                                 <div class="rounded-xl border border-white/5 bg-white/[0.03] p-3">
-                                    <p class="text-[11px] text-zinc-500">Alerts</p>
-                                    <p class="mt-1 text-xl font-semibold text-white">3</p>
+                                    <div class="flex items-start justify-between">
+                                        <p class="text-[11px] text-zinc-500">Active Alerts</p>
+                                        <span class="flex size-5 items-center justify-center rounded-md bg-amber-500/15 text-amber-400">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="size-3"><path d="M12 3 2 20h20L12 3Z" /><path d="M12 10v4M12 17.5v.01" /></svg>
+                                        </span>
+                                    </div>
+                                    <p class="mt-1 text-xl font-semibold text-white">4</p>
                                     <p class="mt-0.5 text-[11px] text-rose-400">1 critical</p>
                                 </div>
                                 <div class="rounded-xl border border-white/5 bg-white/[0.03] p-3">
-                                    <p class="text-[11px] text-zinc-500">Latency</p>
-                                    <p class="mt-1 text-xl font-semibold text-white">4.2ms</p>
-                                    <p class="mt-0.5 text-[11px] text-zinc-500">avg</p>
+                                    <div class="flex items-start justify-between">
+                                        <p class="text-[11px] text-zinc-500">Aggregate Bandwidth</p>
+                                        <span class="flex size-5 items-center justify-center rounded-md bg-cyan-500/15 text-cyan-400">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="size-3"><path d="M2 9a15 15 0 0 1 20 0M5.5 13a9 9 0 0 1 13 0M9 17a4 4 0 0 1 6 0" /><circle cx="12" cy="20" r="0.8" fill="currentColor" /></svg>
+                                        </span>
+                                    </div>
+                                    <p class="mt-1 text-xl font-semibold text-white">32 <span class="text-xs font-normal text-zinc-500">Mbps</span></p>
+                                    <p class="mt-0.5 text-[11px] text-zinc-500">across all links</p>
+                                </div>
+                                <div class="rounded-xl border border-white/5 bg-white/[0.03] p-3">
+                                    <div class="flex items-start justify-between">
+                                        <p class="text-[11px] text-zinc-500">Avg Latency</p>
+                                        <span class="flex size-5 items-center justify-center rounded-md bg-emerald-500/15 text-emerald-400">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="size-3"><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 2" /></svg>
+                                        </span>
+                                    </div>
+                                    <p class="mt-1 text-xl font-semibold text-white">18 <span class="text-xs font-normal text-zinc-500">ms</span></p>
+                                    <p class="mt-0.5 text-[11px] text-zinc-500">0.4% loss</p>
                                 </div>
                             </div>
 
+                            {{-- Recent Alerts --}}
                             <div class="space-y-2 px-5 pb-5">
-                                <div class="flex items-center justify-between rounded-lg border border-rose-500/20 bg-rose-500/5 px-3 py-2.5">
-                                    <div class="flex items-center gap-2">
-                                        <span class="size-1.5 rounded-full bg-rose-400"></span>
-                                        <span class="text-xs text-zinc-300">Port Scan Detected · core-router-01</span>
+                                <p class="px-0.5 pb-1 text-[11px] font-medium tracking-wide text-zinc-500 uppercase">Recent Alerts</p>
+                                <div class="rounded-lg border border-rose-500/20 bg-rose-500/5 px-3 py-2.5">
+                                    <div class="flex items-center justify-between">
+                                        <span class="rounded-full bg-rose-500/15 px-2 py-0.5 text-[10px] font-medium text-rose-400">Critical</span>
+                                        <span class="text-[10px] text-zinc-500">2m ago</span>
                                     </div>
-                                    <span class="text-[10px] font-medium text-rose-400">CRITICAL</span>
+                                    <p class="mt-1.5 text-xs font-medium text-zinc-200">Device Offline</p>
+                                    <p class="text-[11px] text-zinc-500">core-router-01</p>
                                 </div>
-                                <div class="flex items-center justify-between rounded-lg border border-amber-500/20 bg-amber-500/5 px-3 py-2.5">
-                                    <div class="flex items-center gap-2">
-                                        <span class="size-1.5 rounded-full bg-amber-400"></span>
-                                        <span class="text-xs text-zinc-300">High CPU Usage · app-server-02</span>
+                                <div class="rounded-lg border border-amber-500/20 bg-amber-500/5 px-3 py-2.5">
+                                    <div class="flex items-center justify-between">
+                                        <span class="rounded-full bg-amber-500/15 px-2 py-0.5 text-[10px] font-medium text-amber-400">High</span>
+                                        <span class="text-[10px] text-zinc-500">14m ago</span>
                                     </div>
-                                    <span class="text-[10px] font-medium text-amber-400">HIGH</span>
-                                </div>
-                                <div class="flex items-center justify-between rounded-lg border border-white/5 bg-white/[0.03] px-3 py-2.5">
-                                    <div class="flex items-center gap-2">
-                                        <span class="size-1.5 rounded-full bg-cyan-400"></span>
-                                        <span class="text-xs text-zinc-300">Bandwidth trend · last 24h</span>
-                                    </div>
-                                    <svg viewBox="0 0 100 20" class="h-4 w-16 text-cyan-400">
-                                        <polyline fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" points="0,15 15,10 30,12 45,4 60,8 75,3 90,6 100,2" />
-                                    </svg>
+                                    <p class="mt-1.5 text-xs font-medium text-zinc-200">High Latency</p>
+                                    <p class="text-[11px] text-zinc-500">dns-resolver-2</p>
                                 </div>
                             </div>
                         </div>

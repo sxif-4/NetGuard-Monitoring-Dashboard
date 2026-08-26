@@ -13,19 +13,15 @@ class DeviceMetricHistorySeeder extends Seeder
     private const BATCH_SIZE = 250;
 
     /**
-     * Backfill ~30 days of plausible-looking device_metrics history for a
-     * handful of devices, so every historical chart range (1h/24h/7d/30d)
-     * shows a real-looking trend immediately instead of being empty.
+     * Backfill ~30 days of plausible-looking device_metrics history for
+     * every device, so every historical chart range (1h/24h/7d/30d) shows
+     * a real-looking trend immediately instead of being empty.
      */
     public function run(): void
     {
-        $targets = Device::query()
-            ->whereIn('name', ['localhost', 'cloudflare-dns', 'google-dns', 'unreachable-test'])
-            ->get()
-            ->merge(Device::where('status', DeviceStatus::Offline)->where('monitoring_enabled', false)->limit(1)->get())
-            ->merge(Device::where('status', DeviceStatus::Warning)->limit(2)->get());
+        DeviceMetric::truncate();
 
-        foreach ($targets as $device) {
+        foreach (Device::all() as $device) {
             $this->backfill($device);
         }
     }
