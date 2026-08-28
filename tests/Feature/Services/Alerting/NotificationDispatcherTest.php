@@ -6,6 +6,7 @@ use App\Enums\AlertSeverity;
 use App\Jobs\SendTelegramAlertNotification;
 use App\Mail\AlertNotificationMail;
 use App\Models\Alert;
+use App\Models\Device;
 use App\Models\NotificationSetting;
 use App\Services\Alerting\NotificationDispatcher;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -58,21 +59,29 @@ class NotificationDispatcherTest extends TestCase
         Mail::assertNothingQueued();
     }
 
-    public function test_medium_low_and_informational_alerts_dispatch_nothing(): void
+    public function test_medium_low_and_informational_alerts_dispatch_telegram_only(): void
     {
         Queue::fake();
         Mail::fake();
         $this->enableBothChannels();
 
         foreach ([AlertSeverity::Medium, AlertSeverity::Low, AlertSeverity::Informational] as $severity) {
-            $alert = Alert::factory()->create(['severity' => $severity, 'last_notified_at' => null]);
+            // Distinct device per alert so each gets its own per-type
+            // cooldown key -- otherwise a random category/type collision
+            // (e.g. two device-less security alerts of the same type) can
+            // make the second dispatch look suppressed when it isn't.
+            $alert = Alert::factory()->create([
+                'severity' => $severity,
+                'device_id' => Device::factory(),
+                'last_notified_at' => null,
+            ]);
 
             app(NotificationDispatcher::class)->dispatch($alert);
 
-            $this->assertNull($alert->fresh()->last_notified_at);
+            Queue::assertPushed(SendTelegramAlertNotification::class, fn ($job) => $job->alertId === $alert->id);
+            $this->assertNotNull($alert->fresh()->last_notified_at);
         }
 
-        Queue::assertNothingPushed();
         Mail::assertNothingQueued();
     }
 

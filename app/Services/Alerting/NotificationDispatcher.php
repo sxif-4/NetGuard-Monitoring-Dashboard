@@ -136,15 +136,21 @@ class NotificationDispatcher
     }
 
     /**
-     * At most one notification per (category, type) pair per cooldown
-     * window, regardless of which specific alert triggered it. Coarser than
-     * the per-alert cooldown on purpose -- a burst of otherwise-distinct
-     * alerts sharing a type is still one incident worth one ping, not one
-     * ping each.
+     * At most one notification per (category, type[, device]) combo per
+     * cooldown window. Scoped per-device when the alert has one, so distinct
+     * devices sharing an alert type (e.g. four separate offline devices, or
+     * two devices both breaching high_latency) each get their own
+     * notification lane instead of one continuously-breaching device
+     * starving the others out of a shared slot forever. Device-less alerts
+     * (e.g. a port-scan burst keyed by source_ip, which has no device_id)
+     * keep the coarser category+type-only key -- that flood is still one
+     * incident worth one ping, not one ping each.
      */
     private function withinTypeCooldown(Alert $alert, NotificationSetting $settings): bool
     {
-        $key = "notifications:type:{$alert->category->value}:{$alert->type}";
+        $key = $alert->device_id !== null
+            ? "notifications:type:{$alert->category->value}:{$alert->type}:{$alert->device_id}"
+            : "notifications:type:{$alert->category->value}:{$alert->type}";
 
         if (RateLimiter::tooManyAttempts($key, 1)) {
             return true;

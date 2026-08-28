@@ -82,7 +82,7 @@
                         </h1>
 
                         <p class="mt-6 max-w-xl text-lg text-zinc-400">
-                            {{ config('app.name', 'NetGuard') }} polls every device in real time, learns what your normal traffic looks like, and flags port scans, DoS activity, and failing hardware the moment they happen — with alerts that reach you in Telegram and email, not just a dashboard.
+                            {{ config('app.name', 'NetGuard') }} polls every device in real time, learns what your normal traffic looks like, and flags port scans, DoS activity, and failing hardware the moment they happen with alerts that reach you in Telegram and email, not just a dashboard.
                         </p>
 
                         <div class="mt-10 flex flex-wrap items-center gap-4">
@@ -185,7 +185,7 @@
             <section id="features" class="mx-auto max-w-7xl px-6 py-24 lg:px-8">
                 <div class="mx-auto max-w-2xl text-center">
                     <h2 class="text-3xl font-semibold tracking-tight text-white sm:text-4xl">Everything a NOC actually needs</h2>
-                    <p class="mt-4 text-zinc-400">Not a demo. Real ICMP/SNMP polling, a trained ML pipeline, and alerts that route by severity — running today.</p>
+                    <p class="mt-4 text-zinc-400">Not a demo. Real ICMP/SNMP polling, a trained ML pipeline, and alerts that route by severity - running today.</p>
                 </div>
 
                 <div class="mt-16 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
@@ -199,12 +199,12 @@
                             [
                                 'icon' => 'M9.663 17h4.673M12 3v1m6.364 1.636-.707.707M21 12h-1M4 12H3m3.343-5.657-.707-.707m2.828 9.9a5 5 0 1 1 7.072 0l-.548.547A3.374 3.374 0 0 0 14 18.469V19a2 2 0 1 1-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547Z',
                                 'title' => 'ML anomaly detection',
-                                'body' => 'A Random Forest classifies known attack patterns; an Isolation Forest catches traffic that just looks wrong — port scans, DoS shapes, and more.',
+                                'body' => 'A Random Forest classifies known attack patterns; an Isolation Forest catches traffic that just looks wrong - port scans, DoS shapes, and more.',
                             ],
                             [
                                 'icon' => 'M13.19 8.688a4.5 4.5 0 0 1 1.242 7.244l-4.5 4.5a4.5 4.5 0 0 1-6.364-6.364l1.757-1.757m13.35-.622 1.757-1.757a4.5 4.5 0 0 0-6.364-6.364l-4.5 4.5a4.5 4.5 0 0 0 1.242 7.244',
                                 'title' => 'Instant alerts',
-                                'body' => 'Critical alerts reach Telegram and email; high severity reaches Telegram; everything shows up on the dashboard — with a cooldown so nothing spams you.',
+                                'body' => 'Critical alerts reach Telegram and email; high severity reaches Telegram; everything shows up on the dashboard - with a cooldown so nothing spams you.',
                             ],
                             [
                                 'icon' => 'M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 0 1 3 19.875v-6.75ZM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V8.625ZM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V4.125Z',

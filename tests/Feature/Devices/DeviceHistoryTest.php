@@ -24,7 +24,7 @@ class DeviceHistoryTest extends TestCase
 
     public function test_the_page_renders_for_a_device_with_no_metrics(): void
     {
-        $this->actingAs(User::factory()->create());
+        $this->actingAs(User::factory()->admin()->create());
 
         $device = Device::factory()->create();
 
@@ -37,7 +37,7 @@ class DeviceHistoryTest extends TestCase
 
     public function test_the_page_renders_for_a_device_with_metrics(): void
     {
-        $this->actingAs(User::factory()->create());
+        $this->actingAs(User::factory()->admin()->create());
 
         $device = Device::factory()->create();
 

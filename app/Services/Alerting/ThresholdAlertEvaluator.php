@@ -16,6 +16,8 @@ class ThresholdAlertEvaluator
 {
     public function __construct(private readonly NotificationDispatcher $notifier) {}
 
+    private const DEVICE_OFFLINE_TYPE = 'device_offline';
+
     /**
      * metric key => [type slug, title, DeviceMetric accessor]
      *
@@ -45,7 +47,7 @@ class ThresholdAlertEvaluator
         if (! $metric->reachable) {
             $this->trigger(
                 device: $device,
-                type: 'device_offline',
+                type: self::DEVICE_OFFLINE_TYPE,
                 title: 'Device Offline',
                 severity: AlertSeverity::Critical,
                 description: 'Device did not respond to monitoring.',
@@ -100,7 +102,7 @@ class ThresholdAlertEvaluator
     {
         $alert = Alert::query()
             ->where('device_id', $device->id)
-            ->where('type', 'device_offline')
+            ->where('type', self::DEVICE_OFFLINE_TYPE)
             ->where('status', '!=', AlertStatus::Resolved)
             ->first();
 

@@ -124,41 +124,22 @@ class Dashboard extends Component
     #[Computed]
     public function deviceHealthRows(): array
     {
-        $latest = $this->latestMetricsByDevice();
-
-        // Devices whose *latest* poll actually carries a metric value (SNMP
-        // CPU/memory/bandwidth, or at minimum a real latency reading) surface
-        // first -- an unreachable/ICMP-only device's latest row is often all
-        // null, and would otherwise crowd out the devices worth looking at.
-        $hasSignal = $latest->filter(
-            fn (DeviceMetric $metric) => $metric->cpu_pct !== null
-                || $metric->memory_pct !== null
-                || $metric->bandwidth_in_bps !== null
-                || $metric->bandwidth_out_bps !== null
-                || $metric->latency_ms !== null
-        )->keys();
-
-        $statusOrder = "case status when 'offline' then 0 when 'warning' then 1 when 'unknown' then 2 else 3 end";
+        // Only actually-monitored devices (real daemon polling,
+        // monitoring_enabled) show here -- simulated demo devices never
+        // appear, so toggling monitoring on/off in the Devices page directly
+        // controls what surfaces on the Overview. An offline device's latest
+        // poll is legitimately all-null (nothing to report when it never
+        // answered), so it must NOT be filtered out for lacking a metric
+        // value -- that would hide exactly the devices worth looking at.
+        $statusOrder = "case status when 'online' then 0 when 'warning' then 1 when 'unknown' then 2 else 3 end";
 
         $devices = Device::query()
+            ->where('monitoring_enabled', true)
             ->whereHas('metrics')
-            ->whereIn('id', $hasSignal)
             ->orderByRaw($statusOrder)
             ->orderBy('name')
             ->limit(8)
             ->get();
-
-        if ($devices->count() < 8) {
-            $filler = Device::query()
-                ->whereHas('metrics')
-                ->whereNotIn('id', $devices->pluck('id'))
-                ->orderByRaw($statusOrder)
-                ->orderBy('name')
-                ->limit(8 - $devices->count())
-                ->get();
-
-            $devices = $devices->concat($filler);
-        }
 
         return $devices->map(function (Device $device) {
             $history = DeviceMetric::query()

@@ -22,7 +22,7 @@ class NotificationSettingsUpdateTest extends TestCase
 
     public function test_the_page_shows_current_settings(): void
     {
-        $this->actingAs(User::factory()->create());
+        $this->actingAs(User::factory()->admin()->create());
 
         NotificationSetting::current()->update([
             'telegram_enabled' => true,

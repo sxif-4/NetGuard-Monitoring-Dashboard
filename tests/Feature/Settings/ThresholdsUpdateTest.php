@@ -29,7 +29,7 @@ class ThresholdsUpdateTest extends TestCase
 
     public function test_the_thresholds_page_shows_seeded_defaults(): void
     {
-        $this->actingAs(User::factory()->create());
+        $this->actingAs(User::factory()->admin()->create());
 
         $this->get(route('thresholds.edit'))
             ->assertOk()

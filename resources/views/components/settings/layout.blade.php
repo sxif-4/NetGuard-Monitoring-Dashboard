@@ -6,6 +6,7 @@
             <flux:navlist.item :href="route('appearance.edit')" wire:navigate>{{ __('Appearance') }}</flux:navlist.item>
             <flux:navlist.item :href="route('thresholds.edit')" wire:navigate>{{ __('Thresholds') }}</flux:navlist.item>
             <flux:navlist.item :href="route('notifications.edit')" wire:navigate>{{ __('Notifications') }}</flux:navlist.item>
+            <flux:navlist.item :href="route('users.index')" wire:navigate>{{ __('User Management') }}</flux:navlist.item>
         </flux:navlist>
     </div>
 
@@ -15,7 +16,7 @@
         <flux:heading>{{ $heading ?? '' }}</flux:heading>
         <flux:subheading>{{ $subheading ?? '' }}</flux:subheading>
 
-        <div class="mt-5 w-full max-w-lg">
+        <div class="mt-5 w-full {{ ($wide ?? false) ? 'max-w-3xl' : 'max-w-lg' }}">
             {{ $slot }}
         </div>
     </div>
